@@ -1,1 +1,142 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universo de Personajes</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #111;
+      color: white;
+    }
+    header {
+      padding: 15px;
+      background: #222;
+      text-align: center;
+      font-size: 20px;
+    }
+    #editorToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      background: #444;
+      border: none;
+      color: white;
+      border-radius: 10px;
+    }
+    #addBox {
+      display: none;
+      margin: 10px;
+      padding: 10px;
+      background: #333;
+      border-radius: 10px;
+    }
+    .container {
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+    }
+    .box {
+      background: #222;
+      border-radius: 15px;
+      padding: 10px;
+    }
+    img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+      padding: 5px;
+    }
+    button {
+      margin-top: 5px;
+      padding: 5px;
+      border: none;
+      border-radius: 5px;
+      background: #555;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<header>Mi Universo</header>
+<button id="editorToggle">Modo Editor</button>
+
+<div id="addBox">
+  <input id="name" placeholder="Nombre del personaje">
+  <input id="image" placeholder="URL de imagen">
+  <textarea id="desc" placeholder="Descripción"></textarea>
+  <button onclick="addCharacter()">Agregar Casilla</button>
+</div>
+
+<div class="container" id="container"></div>
+
+<script>
+let editor = false;
+
+const toggleBtn = document.getElementById('editorToggle');
+const addBox = document.getElementById('addBox');
+const container = document.getElementById('container');
+
+let data = JSON.parse(localStorage.getItem('characters')) || [];
+
+function save() {
+  localStorage.setItem('characters', JSON.stringify(data));
+}
+
+function render() {
+  container.innerHTML = '';
+  data.forEach((char, index) => {
+    const div = document.createElement('div');
+    div.className = 'box';
+
+    div.innerHTML = `
+      <img src="${char.image}" />
+      <h3>${char.name}</h3>
+      <p>${char.desc}</p>
+      ${editor ? `<button onclick="deleteChar(${index})">Eliminar</button>` : ''}
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+function addCharacter() {
+  const name = document.getElementById('name').value;
+  const image = document.getElementById('image').value;
+  const desc = document.getElementById('desc').value;
+
+  if (!name) return alert('Falta nombre');
+
+  data.push({ name, image, desc });
+  save();
+  render();
+}
+
+function deleteChar(i) {
+  data.splice(i, 1);
+  save();
+  render();
+}
+
+toggleBtn.onclick = () => {
+  editor = !editor;
+  addBox.style.display = editor ? 'block' : 'none';
+  render();
+};
+
+render();
+</script>
+
+</body>
+</html>
